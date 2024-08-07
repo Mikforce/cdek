@@ -139,24 +139,7 @@
 
             // Validate input before sending
             if (validateInput(formObject)) {
-                fetch('/api/zakaz1', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formObject),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        alert('Заказ успешно создан');
-                    } else {
-                        alert('Ошибка при создании заказа: ' + data.message);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
+                Telegram.WebApp.sendData(JSON.stringify(formObject));
             } else {
                 alert("Пожалуйста, заполните все обязательные поля корректно.");
             }
@@ -176,7 +159,7 @@
 
             // Validate items
             for (const item of data.items) {
-                if (!item.name || !item.ware_key || !item.cost || !item.weight || !item.amount) {
+                if (!item.name || !item.ware_key || !item.payment.value || !item.payment.vat_sum || !item.payment.vat_rate || !item.cost || !item.weight || !item.amount) {
                     return false;
                 }
             }
