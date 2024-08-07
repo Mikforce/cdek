@@ -159,7 +159,7 @@
 
             // Validate items
             for (const item of data.items) {
-                if (!item.name || !item.ware_key || !item.payment.value || !item.payment.vat_sum || !item.payment.vat_rate || !item.cost || !item.weight || !item.amount) {
+                if (!item.name || !item.ware_key || !item.cost || !item.weight || !item.amount) {
                     return false;
                 }
             }
