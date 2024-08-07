@@ -203,20 +203,11 @@
             display: flex;
             flex-direction: column;
         }
-        input, button {
+        input {
             margin: 10px 0;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
-        }
-        button {
-            background-color: #0088cc;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #006699;
         }
         #debug {
             margin-top: 20px;
@@ -234,7 +225,6 @@
             <input type="text" id="name" placeholder="Ваше имя" required>
             <input type="text" id="address" placeholder="Адрес доставки" required>
             <input type="text" id="trackingNumber" placeholder="Номер отслеживания" required>
-            <button type="submit">Отправить</button>
         </form>
         <div id="debug"></div>
     </div>
@@ -248,32 +238,43 @@
         if (tg) {
             debugElement.innerHTML += '<br>Telegram WebApp обнаружен.';
             tg.expand();
+
+            // Настройка главной кнопки
+            tg.MainButton.setText("Отправить");
+            tg.MainButton.show();
+
+            // Обработчик события клика по главной кнопке
+            tg.MainButton.onClick(function(){
+                let name = document.getElementById('name').value;
+                let address = document.getElementById('address').value;
+                let trackingNumber = document.getElementById('trackingNumber').value;
+
+                let data = {
+                    name: name,
+                    address: address,
+                    trackingNumber: trackingNumber
+                };
+
+                debugElement.innerHTML += '<br>Данные для отправки: ' + JSON.stringify(data);
+
+                tg.sendData(JSON.stringify(data));
+                debugElement.innerHTML += '<br>Данные отправлены в бот.';
+                tg.close();
+            });
         } else {
             debugElement.innerHTML += '<br>Ошибка: Telegram WebApp не обнаружен.';
         }
 
-        document.getElementById('cdekForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            debugElement.innerHTML += '<br>Форма отправлена.';
-
+        // Обновление состояния кнопки при изменении полей формы
+        document.getElementById('cdekForm').addEventListener('input', function() {
             let name = document.getElementById('name').value;
             let address = document.getElementById('address').value;
             let trackingNumber = document.getElementById('trackingNumber').value;
 
-            let data = {
-                name: name,
-                address: address,
-                trackingNumber: trackingNumber
-            };
-
-            debugElement.innerHTML += '<br>Данные для отправки: ' + JSON.stringify(data);
-
-            if (tg && tg.sendData) {
-                tg.sendData(JSON.stringify(data));
-                debugElement.innerHTML += '<br>Данные отправлены в бот.';
-                tg.close();
+            if (name && address && trackingNumber) {
+                tg.MainButton.enable();
             } else {
-                debugElement.innerHTML += '<br>Ошибка: Не удалось отправить данные в бот.';
+                tg.MainButton.disable();
             }
         });
     </script>
