@@ -90,14 +90,14 @@
                 <div class="item form-group">
                     <label for="item_name" class="form-label">Название предмета:</label>
                     <input type="text" class="form-control" id="item_name" name="item_name[]" required>
-                    <label for="ware_key" class="form-label">Ключ товара:</label>
+                    <label for="ware_key" class="form-label">Идентификатор/артикул товара:</label>
                     <input type="text" class="form-control" id="ware_key" name="ware_key[]" required>
-                    <label for="payment_value" class="form-label">Стоимость оплаты:</label>
-                    <input type="number" class="form-control" id="payment_value" name="payment_value[]" required>
-                    <label for="vat_sum" class="form-label">Сумма НДС:</label>
-                    <input type="number" class="form-control" id="vat_sum" name="vat_sum[]" required>
-                    <label for="vat_rate" class="form-label">Ставка НДС (%):</label>
-                    <input type="number" class="form-control" id="vat_rate" name="vat_rate[]" required>
+<!--                    <label for="payment_value" class="form-label">Стоимость оплаты:</label>-->
+<!--                    <input type="number" class="form-control" id="payment_value" name="payment_value[]" required>-->
+<!--                    <label for="vat_sum" class="form-label">Сумма НДС:</label>-->
+<!--                    <input type="number" class="form-control" id="vat_sum" name="vat_sum[]" required>-->
+<!--                    <label for="vat_rate" class="form-label">Ставка НДС (%):</label>-->
+<!--                    <input type="number" class="form-control" id="vat_rate" name="vat_rate[]" required>-->
                     <label for="cost" class="form-label">Стоимость:</label>
                     <input type="number" class="form-control" id="cost" name="cost[]" required>
                     <label for="item_weight" class="form-label">Вес предмета (г):</label>
@@ -126,11 +126,6 @@
                 const itemData = {
                     name: item.querySelector('[name="item_name[]"]').value,
                     ware_key: item.querySelector('[name="ware_key[]"]').value,
-                    payment: {
-                        value: item.querySelector('[name="payment_value[]"]').value,
-                        vat_sum: item.querySelector('[name="vat_sum[]"]').value,
-                        vat_rate: item.querySelector('[name="vat_rate[]"]').value
-                    },
                     cost: item.querySelector('[name="cost[]"]').value,
                     weight: item.querySelector('[name="item_weight[]"]').value,
                     amount: item.querySelector('[name="amount[]"]').value
@@ -144,7 +139,24 @@
 
             // Validate input before sending
             if (validateInput(formObject)) {
-                Telegram.WebApp.sendData(JSON.stringify(formObject));
+                fetch('/api/zakaz1', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formObject),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Заказ успешно создан');
+                    } else {
+                        alert('Ошибка при создании заказа: ' + data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
             } else {
                 alert("Пожалуйста, заполните все обязательные поля корректно.");
             }
@@ -164,7 +176,7 @@
 
             // Validate items
             for (const item of data.items) {
-                if (!item.name || !item.ware_key || !item.payment.value || !item.payment.vat_sum || !item.payment.vat_rate || !item.cost || !item.weight || !item.amount) {
+                if (!item.name || !item.ware_key || !item.cost || !item.weight || !item.amount) {
                     return false;
                 }
             }
